@@ -1,0 +1,42 @@
+vpn:
+  hosts:
+    us-west:
+      ansible_host: us-west.vpn.9at8.dev
+      ansible_ssh_private_key_file: ~/.ssh/azure-vpn
+
+    uk-south:
+      ansible_host: uk-south.vpn.9at8.dev
+      ansible_ssh_private_key_file: ~/.ssh/azure-vpn-uk
+
+  vars:
+    # IPv4 space
+    wireguard_ipv4: 10.20.0.0
+
+    # IPv4 mask
+    wireguard_ipv4_mask: 16
+
+    # TODO: IPv6 is not supported yet
+    # # IPv6 space
+    # wireguard_ipv6: fd6e:72cd:19b7::/64
+
+    # Port to use for wireguard
+    wireguard_port: 51820
+
+    # Directory to store all the public and private keys
+    wireguard_data: ~/wireguard
+
+    # names of the peers
+    wireguard_peers:
+    - server # first peer is always considered the server
+    - desktop
+    - phone
+
+    # DNS to use on clients
+    wireguard_client_dns: 9.9.9.9 # Quad9 DNS
+
+    # where to save the generated config files
+    wireguard_configs_controller_path: configs
+
+    # --------------- Internal variables ---------------
+    __wireguard_client_configs: configs
+    __wireguard_server_config: /etc/wireguard/wg0.conf

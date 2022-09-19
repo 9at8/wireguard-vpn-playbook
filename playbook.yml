@@ -1,0 +1,87 @@
+- name: Setup VPN server
+  hosts: all
+  become: yes
+
+  tasks:
+  - name: Install wireguard
+    ansible.builtin.apt:
+      name:
+        - wireguard
+      state: present
+      update_cache: true
+
+  - name: Create data directory
+    file:
+      path: '{{ wireguard_data }}'
+      state: directory
+
+  - name: Create config directory
+    file:
+      path: '{{ wireguard_data }}/{{ __wireguard_client_configs  }}'
+      state: directory
+
+  - name: Generate public and private keys
+    shell:
+      creates: '{{ wireguard_data }}/{{ item }}.private'
+      cmd: umask 077; wg genkey | tee {{ wireguard_data }}/{{ item }}.private | wg pubkey > {{ wireguard_data }}/{{ item }}.public
+    loop: '{{ wireguard_peers }}'
+
+  - name: Enable IPv4 forwarding
+    sysctl:
+      key: net.ipv4.ip_forward
+      value: 1
+
+  - name: Enable IPv6 forwarding
+    sysctl:
+      key: net.ipv6.conf.all.forwarding
+      value: 1
+
+  - name: Read server private key
+    shell: cat {{ wireguard_data }}/{{ wireguard_peers[0] }}.private
+    register: server_private_key
+
+  - name: Read server public key
+    shell: cat {{ wireguard_data }}/{{ wireguard_peers[0] }}.public
+    register: server_public_key
+
+  - name: Read client private keys
+    shell: cat {{ wireguard_data }}/{{ item }}.private
+    loop: '{{ wireguard_peers[1:] }}'
+    register: client_private_keys
+
+  - name: Read client public keys
+    shell: cat {{ wireguard_data }}/{{ item }}.public
+    loop: '{{ wireguard_peers[1:] }}'
+    register: client_public_keys
+
+  - name: Generate server config
+    template:
+      src: templates/server.conf
+      dest: '{{ __wireguard_server_config }}'
+      owner: root
+      group: root
+      mode: 0600
+
+  - name: Generate client configs
+    template:
+      src: templates/client.conf
+      dest: '{{ wireguard_data }}/{{ __wireguard_client_configs }}/{{ item.item }}.conf'
+      owner: root
+      group: root
+      mode: 0600
+    loop: '{{ client_private_keys.results }}'
+    loop_control:
+      extended: yes
+      label: '{{ item.item }}'
+
+  - name: Enable the wg-quick service
+    systemd:
+      name: wg-quick@wg0
+      enabled: yes
+      state: restarted
+
+  - name: Fetch client configs
+    fetch:
+      src: '{{ wireguard_data }}/{{ __wireguard_client_configs }}/{{ item }}.conf'
+      dest: '{{ wireguard_configs_controller_path }}'
+    loop: '{{ wireguard_peers[1:] }}'
