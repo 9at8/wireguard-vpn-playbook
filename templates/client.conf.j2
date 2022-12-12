@@ -1,6 +1,8 @@
+{% import 'helpers.j2' as helpers %}
+
 [Interface]
 PrivateKey = {{ item.stdout }}
-Address = {{ '.'.join(wireguard_ipv4.split('.')[:-1]) }}.{{ wireguard_ipv4.split('.')[-1] | int + ansible_loop.index }}/16
+Address = {{ helpers.ipv4(wireguard_ipv4, ansible_loop.index + 1) }}/16
 DNS = {{ wireguard_client_dns }}
 
 [Peer]

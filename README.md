@@ -7,3 +7,8 @@
 - Run the playbook: `ansible-playbook -i inventory.yml playbook.yml`.
 - Once the playbook is done, all client configs should be present in the [config](inventory.yml#L38) directory.
 - Download the wireguard app on your device and profit.
+
+## Known Issues
+
+- Sometimes I need to run `sudo ip addr flush dev eth0` if I get `RTNETLINK answers: File exists` error.
+  - https://raspberrypi.stackexchange.com/questions/13895/solving-rtnetlink-answers-file-exists-when-running-ifup

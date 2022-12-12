@@ -1,0 +1,15 @@
+{#
+This macro takes an ipv4 address and adds the dist to the last part of it.
+For example: ipv4('192.168.1.1', 5) will return '192.168.1.6'
+#}
+{% macro ipv4(addr, dist) -%}
+  {{ '.'.join(addr.split('.')[:-1]) + '.' + ((addr.split('.')[-1] | int) + dist) | string }}
+{%- endmacro %}
+
+{#
+TODO: This macro takes an ipv6 address and adds the dist to the last part of it.
+For example: ipv6('', ) will return ''
+#}
+{% macro ipv6(addr, dist) -%}
+  {{ '.'.join(addr.split('.')[:-1]) }}.{{ addr.split('.')[-1] | int + dist }}
+{%- endmacro %}
