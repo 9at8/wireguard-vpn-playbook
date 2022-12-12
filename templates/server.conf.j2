@@ -2,16 +2,17 @@
 
 [Interface]
 Address = {{ helpers.ipv4(wireguard_ipv4, 1) }}/{{ wireguard_ipv4_mask }}
+Address = {{ helpers.ipv6(wireguard_ipv6, 1) }}/{{ wireguard_ipv6_mask }}
 ListenPort = {{ wireguard_port }}
 PrivateKey = {{ server_private_key.stdout }}
 PostUp = ufw route allow in on wg0 out on {{ ansible_default_ipv4.alias }}
 PostUp = iptables -t nat -I POSTROUTING -o {{ ansible_default_ipv4.alias }} -j MASQUERADE
-# PostUp = ip6tables -t nat -I POSTROUTING -o {{ ansible_default_ipv4.alias }} -j MASQUERADE
+PostUp = ip6tables -t nat -I POSTROUTING -o {{ ansible_default_ipv4.alias }} -j MASQUERADE
 PostUp = ip rule add table 200 from {{ ansible_default_ipv4.address }}
 PostUp = ip route add table 200 default via {{ ansible_default_ipv4.gateway }}
 PreDown = ufw route delete allow in on wg0 out on {{ ansible_default_ipv4.alias }}
 PreDown = iptables -t nat -D POSTROUTING -o {{ ansible_default_ipv4.alias }} -j MASQUERADE
-# PreDown = ip6tables -t nat -D POSTROUTING -o {{ ansible_default_ipv4.alias }} -j MASQUERADE
+PreDown = ip6tables -t nat -D POSTROUTING -o {{ ansible_default_ipv4.alias }} -j MASQUERADE
 PreDown = ip rule delete table 200 from {{ ansible_default_ipv4.address }}
 PreDown = ip route delete table 200 default via {{ ansible_default_ipv4.gateway }}
 
@@ -20,4 +21,5 @@ PreDown = ip route delete table 200 default via {{ ansible_default_ipv4.gateway 
 [Peer]
 PublicKey = {{ key.stdout }}
 AllowedIPs = {{ helpers.ipv4(wireguard_ipv4, loop.index + 1) }}/32
+AllowedIPs = {{ helpers.ipv6(wireguard_ipv6, loop.index + 1) }}/128
 {% endfor %}

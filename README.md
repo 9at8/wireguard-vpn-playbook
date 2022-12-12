@@ -12,3 +12,6 @@
 
 - Sometimes I need to run `sudo ip addr flush dev eth0` if I get `RTNETLINK answers: File exists` error.
   - https://raspberrypi.stackexchange.com/questions/13895/solving-rtnetlink-answers-file-exists-when-running-ifup
+- Hex math for ipv6 in `helpers.j2` is incorrect.
+- If you want to add exclusions to traffic, replace the `AllowedIPs` part of `client.conf.j2`. You can use the following tool to calculate it:
+  - https://www.procustodibus.com/blog/2021/03/wireguard-allowedips-calculator/

@@ -7,9 +7,9 @@ For example: ipv4('192.168.1.1', 5) will return '192.168.1.6'
 {%- endmacro %}
 
 {#
-TODO: This macro takes an ipv6 address and adds the dist to the last part of it.
-For example: ipv6('', ) will return ''
+This macro takes an ipv6 address and adds the dist to the last part of it.
+For example: ipv6('fd6e:72cd:19b7::5', 4) will return 'fd6e:72cd:19b7::9'
 #}
 {% macro ipv6(addr, dist) -%}
-  {{ '.'.join(addr.split('.')[:-1]) }}.{{ addr.split('.')[-1] | int + dist }}
+  {{ addr.split('::')[0] + '::' + ((addr.split('::')[1] | int) + dist) | string }}
 {%- endmacro %}

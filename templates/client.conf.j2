@@ -3,9 +3,11 @@
 [Interface]
 PrivateKey = {{ item.stdout }}
 Address = {{ helpers.ipv4(wireguard_ipv4, ansible_loop.index + 1) }}/16
-DNS = {{ wireguard_client_dns }}
+Address = {{ helpers.ipv6(wireguard_ipv6, ansible_loop.index + 1) }}/64
+DNS = {{ wireguard_client_dns_ipv4 }}
+DNS = {{ wireguard_client_dns_ipv6 }}
 
 [Peer]
 PublicKey = {{ server_public_key.stdout }}
-AllowedIPs = 0.0.0.0/1, 128.0.0.0/1
+AllowedIPs = 0.0.0.0/0, ::/0
 Endpoint = {{ ansible_host }}:{{ wireguard_port }}

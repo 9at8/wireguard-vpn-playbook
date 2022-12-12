@@ -15,9 +15,11 @@ vpn:
     # IPv4 mask
     wireguard_ipv4_mask: 16
 
-    # TODO: IPv6 is not supported yet
-    # # IPv6 space
-    # wireguard_ipv6: fd6e:72cd:19b7::/64
+    # IPv6 space
+    wireguard_ipv6: fd6e:72cd:19b7::0
+
+    # IPv6 mask
+    wireguard_ipv6_mask: 64
 
     # Port to use for wireguard
     wireguard_port: 51820
@@ -32,7 +34,8 @@ vpn:
     - phone
 
     # DNS to use on clients
-    wireguard_client_dns: 9.9.9.9 # Quad9 DNS
+    wireguard_client_dns_ipv4: 9.9.9.9 # Quad9 DNS
+    wireguard_client_dns_ipv6: 2620:fe::fe # Quad9 DNS
 
     # where to save the generated config files
     wireguard_configs_controller_path: configs
