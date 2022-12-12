@@ -56,7 +56,7 @@
 
   - name: Generate server config
     template:
-      src: templates/server.conf
+      src: templates/server.conf.j2
       dest: '{{ __wireguard_server_config }}'
       owner: root
       group: root
@@ -64,7 +64,7 @@
 
   - name: Generate client configs
     template:
-      src: templates/client.conf
+      src: templates/client.conf.j2
       dest: '{{ wireguard_data }}/{{ __wireguard_client_configs }}/{{ item.item }}.conf'
       owner: root
       group: root
