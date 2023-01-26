@@ -11,3 +11,6 @@ DNS = {{ wireguard_client_dns_ipv6 }}
 PublicKey = {{ server_public_key.stdout }}
 AllowedIPs = 0.0.0.0/0, ::/0
 Endpoint = {{ ansible_host }}:{{ wireguard_port }}
+{% if 'keepalive' in item.item %}
+PersistentKeepalive = {{ item.item.keepalive }}
+{% endif%}

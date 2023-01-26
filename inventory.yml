@@ -27,11 +27,17 @@ vpn:
     # Directory to store all the public and private keys
     wireguard_data: ~/wireguard
 
-    # names of the peers
+    # Names and configs of all peers
     wireguard_peers:
-    - server # first peer is always considered the server
-    - desktop
-    - phone
+    - name: server # first peer is always considered the server
+    - name: desktop
+      keepalive: 25 # this is essential if devices behind a NAT need to be accessed
+    - name: phone
+    - name: raspberry-pi
+      keepalive: 25
+    - name: homeserver
+      keepalive: 25
+    - name: laptop
 
     # DNS to use on clients
     wireguard_client_dns_ipv4: 9.9.9.9 # Quad9 DNS

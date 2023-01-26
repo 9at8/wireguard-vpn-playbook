@@ -22,8 +22,8 @@
 
   - name: Generate public and private keys
     shell:
-      creates: '{{ wireguard_data }}/{{ item }}.private'
-      cmd: umask 077; wg genkey | tee {{ wireguard_data }}/{{ item }}.private | wg pubkey > {{ wireguard_data }}/{{ item }}.public
+      creates: '{{ wireguard_data }}/{{ item.name }}.private'
+      cmd: umask 077; wg genkey | tee {{ wireguard_data }}/{{ item.name }}.private | wg pubkey > {{ wireguard_data }}/{{ item.name }}.public
     loop: '{{ wireguard_peers }}'
 
   - name: Enable IPv4 forwarding
@@ -37,20 +37,20 @@
       value: 1
 
   - name: Read server private key
-    shell: cat {{ wireguard_data }}/{{ wireguard_peers[0] }}.private
+    shell: cat {{ wireguard_data }}/{{ wireguard_peers[0].name }}.private
     register: server_private_key
 
   - name: Read server public key
-    shell: cat {{ wireguard_data }}/{{ wireguard_peers[0] }}.public
+    shell: cat {{ wireguard_data }}/{{ wireguard_peers[0].name }}.public
     register: server_public_key
 
   - name: Read client private keys
-    shell: cat {{ wireguard_data }}/{{ item }}.private
+    shell: cat {{ wireguard_data }}/{{ item.name }}.private
     loop: '{{ wireguard_peers[1:] }}'
     register: client_private_keys
 
   - name: Read client public keys
-    shell: cat {{ wireguard_data }}/{{ item }}.public
+    shell: cat {{ wireguard_data }}/{{ item.name }}.public
     loop: '{{ wireguard_peers[1:] }}'
     register: client_public_keys
 
@@ -65,14 +65,14 @@
   - name: Generate client configs
     template:
       src: templates/client.conf.j2
-      dest: '{{ wireguard_data }}/{{ __wireguard_client_configs }}/{{ item.item }}.conf'
+      dest: '{{ wireguard_data }}/{{ __wireguard_client_configs }}/{{ item.item.name }}.conf'
       owner: root
       group: root
       mode: 0600
     loop: '{{ client_private_keys.results }}'
     loop_control:
       extended: yes
-      label: '{{ item.item }}'
+      label: '{{ item.item.name }}'
 
   - name: Enable the wg-quick service
     systemd:
@@ -82,6 +82,6 @@
 
   - name: Fetch client configs
     fetch:
-      src: '{{ wireguard_data }}/{{ __wireguard_client_configs }}/{{ item }}.conf'
+      src: '{{ wireguard_data }}/{{ __wireguard_client_configs }}/{{ item.name }}.conf'
       dest: '{{ wireguard_configs_controller_path }}'
     loop: '{{ wireguard_peers[1:] }}'

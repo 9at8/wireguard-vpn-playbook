@@ -22,4 +22,7 @@ PreDown = ip route delete table 200 default via {{ ansible_default_ipv4.gateway 
 PublicKey = {{ key.stdout }}
 AllowedIPs = {{ helpers.ipv4(wireguard_ipv4, loop.index + 1) }}/32
 AllowedIPs = {{ helpers.ipv6(wireguard_ipv6, loop.index + 1) }}/128
+{% if 'keepalive' in wireguard_peers[loop.index] %}
+PersistentKeepalive = {{ wireguard_peers[loop.index].keepalive }}
+{% endif%}
 {% endfor %}
